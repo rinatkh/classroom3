@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/rinatsm/go-course/classroom3/internal/loops"
+	"github.com/rinatkh/classroom3/internal/loops"
 )
 
 func main() {

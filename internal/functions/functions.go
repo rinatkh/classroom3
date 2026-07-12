@@ -1,66 +1,34 @@
 package functions
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 )
 
-// FullName склеивает имя и фамилию через пробел.
-func FullName(firstName, lastName string) string {
-	return strings.TrimSpace(firstName + " " + lastName)
+type User struct {
+	ID     int
+	Name   string
+	Active bool
 }
 
-// PriceWithDiscount применяет скидку в процентах.
-func PriceWithDiscount(price float64, discountPercent float64) float64 {
-	if price < 0 || discountPercent < 0 {
-		return 0
-	}
-	if discountPercent > 100 {
-		discountPercent = 100
-	}
-	return price * (100 - discountPercent) / 100
-}
-
-// SafeDivide делит a на b и возвращает флаг успеха.
-func SafeDivide(a, b int) (int, bool) {
+func SafeDivide(a, b int) (int, error) {
 	if b == 0 {
-		return 0, false
+		return 0, errors.New("division by zero")
 	}
-	return a / b, true
+	return a / b, nil
 }
 
-// MinMax возвращает минимальное и максимальное значение.
-func MinMax(a, b int) (int, int) {
-	if a < b {
-		return a, b
+func FindActiveUser(users []User, id int) (User, bool) {
+	for _, user := range users {
+		if user.ID == id && user.Active {
+			return user, true
+		}
 	}
-	return b, a
+	return User{}, false
 }
 
-// NormalizeEmail приводит email к нижнему регистру и убирает пробелы.
-func NormalizeEmail(email string) string {
-	return strings.ToLower(strings.TrimSpace(email))
-}
-
-// FormatUser формирует короткую строку пользователя.
-func FormatUser(id int, name string, active bool) string {
-	status := "inactive"
-	if active {
-		status = "active"
-	}
-	return fmt.Sprintf("#%d %s (%s)", id, name, status)
-}
-
-// ApplyOperation применяет переданную функцию к двум числам.
-func ApplyOperation(a, b int, operation func(int, int) int) int {
-	if operation == nil {
-		return 0
-	}
-	return operation(a, b)
-}
-
-// SumVariadic складывает любое количество чисел.
-func SumVariadic(numbers ...int) int {
+func SumAll(numbers ...int) int {
 	sum := 0
 	for _, number := range numbers {
 		sum += number
@@ -68,64 +36,79 @@ func SumVariadic(numbers ...int) int {
 	return sum
 }
 
-// BuildGreeting возвращает приветствие на выбранном языке.
-func BuildGreeting(language, name string) string {
-	switch language {
-	case "ru":
-		return "Привет, " + name
-	case "en":
-		return "Hello, " + name
-	default:
-		return "Hi, " + name
-	}
+func Apply(a, b int, op func(int, int) int) int {
+	return op(a, b)
 }
 
-// ValidatePassword проверяет пароль и возвращает объяснение.
-func ValidatePassword(password string) (bool, string) {
-	if len(password) < 8 {
-		return false, "password is too short"
-	}
-	if !strings.ContainsAny(password, "0123456789") {
-		return false, "password must contain digit"
-	}
-	return true, "ok"
-}
-
-// SplitFullName разделяет строку на имя и фамилию.
-func SplitFullName(fullName string) (string, string) {
-	parts := strings.Fields(fullName)
-	if len(parts) == 0 {
-		return "", ""
-	}
-	if len(parts) == 1 {
-		return parts[0], ""
-	}
-	return parts[0], parts[1]
-}
-
-// CalcOrderTotal считает итог заказа с доставкой и скидкой.
-func CalcOrderTotal(price, delivery, discount float64) float64 {
-	return PriceWithDiscount(price, discount) + delivery
-}
-
-// MakeCounter возвращает функцию-счётчик.
-func MakeCounter(start int) func() int {
-	value := start
+func NewCounter() func() int {
+	count := 0
 	return func() int {
-		value++
-		return value
+		count++
+		return count
 	}
 }
 
-// Swap меняет два значения местами и возвращает результат.
-func Swap(a, b string) (string, string) {
-	return b, a
+func DeferOrder() (result string) {
+	// Тема: несколько defer выполняются в обратном порядке — LIFO.
+	// Важно: defer выполнится после того, как return-значение уже подготовлено,
+	// но до фактического выхода из функции.
+	result = "first" // "first"
+	defer func() { result += "-third" }()
+	defer func() { result += "-second" }()
+	return
 }
 
-// Average возвращает среднее значение и флаг успеха.
-func Average(numbers ...int) (float64, bool) {
-	if len(numbers) == 0 {
-		return 0, false
+func DeferArguments() (result string) {
+	// Тема: аргументы defer вычисляются сразу, в момент объявления defer.
+	// Частая ошибка: думать, что defer возьмёт новое значение переменной при выходе из функции.
+	value := "first" // "first"
+	defer func(captured string) {
+		result = "captured=" + captured + " current=" + value
+	}(value)
+
+	value = "second" // "second"
+	result = "body"
+	return
+}
+
+func Example() string {
+	var out strings.Builder
+
+	// Тема: функция — маленькое именованное действие с понятной сигнатурой.
+	// В этом блоке уже можно использовать всё, что прошли раньше: errors, structs, slices, loops.
+	quotient, err := SafeDivide(10, 2) // 5, nil
+	errorText := "nil"                 // "nil"
+	if err != nil {
+		errorText = err.Error()
 	}
-	return float64(SumVariadic(numbers...)) / float64(len(numbers)), true
+	fmt.Fprintf(&out, "divide=%d\n", quotient)
+	fmt.Fprintf(&out, "err=%s\n", errorText)
+
+	users := []User{{ID: 1, Name: "Maria", Active: true}, {ID: 2, Name: "Alex", Active: false}} // [{1 Maria true} {2 Alex false}]
+	user, ok := FindActiveUser(users, 1)                                                        // {1 Maria true}, true
+	fmt.Fprintf(&out, "user=%s\n", user.Name)
+	fmt.Fprintf(&out, "ok=%t\n", ok)
+
+	sum := SumAll(1, 2, 3, 4) // 10
+	fmt.Fprintf(&out, "sum=%d\n", sum)
+
+	product := Apply(3, 4, func(a, b int) int { return a * b }) // 12
+	fmt.Fprintf(&out, "product=%d\n", product)
+
+	counter := NewCounter()
+	first := counter()  // 1
+	second := counter() // 2
+	fmt.Fprintf(&out, "counter=%d/%d\n", first, second)
+
+	// Тема: defer выполняется при выходе из функции в обратном порядке.
+	deferOrder := DeferOrder() // first-second-third
+	fmt.Fprintf(&out, "defer=%s\n", deferOrder)
+
+	// Тема: параметры deferred-вызова вычисляются сразу.
+	// captured останется "first", хотя value позже изменился на "second".
+	deferArguments := DeferArguments() // captured=first current=second
+	fmt.Fprintf(&out, "args=%s", deferArguments)
+
+	// Ответ: увидим результат деления, найденного пользователя, variadic, function value, closure и defer.
+	return out.String()
 }

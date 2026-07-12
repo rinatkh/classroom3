@@ -1,23 +1,23 @@
-# classroom3: циклы, функции, массивы, слайсы
+# Classroom 3 — Go Core: данные, коллекции и управляющий код
 
-Классная работа для третьего занятия курса Go.
+Темы урока:
 
-## Темы
+1. `error` как значение
+2. массивы
+3. структуры без методов
+4. `new` и `make`
+5. слайсы
+6. циклы
+7. функции и `defer`
+8. `panic` / `recover`
 
-1. `internal/loops` — `for`, `range`, `break`, `continue`, вложенные циклы.
-2. `internal/functions` — параметры, возвращаемые значения, несколько return, variadic, function as value.
-3. `internal/arrays` — массивы, фиксированная длина, value semantics, сравнение массивов.
-4. `internal/slices` — `append`, `len`, `cap`, под-слайсы, копирование, удаление, вставка.
+Правило проекта: в `cmd/.../main.go` только запуск `Example()`. Вся учебная логика лежит в `internal/...`.
 
-## Как запускать
+## Команды
 
 ```bash
 make run-all
-make test
+make test-unit
+make test-integration
 make ci
 ```
-
-## Главное правило структуры
-
-`cmd/*/main.go` только вызывает `Example()`.
-Вся логика находится в `internal/*`.
