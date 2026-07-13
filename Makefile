@@ -6,7 +6,7 @@ INTEGRATION_PACKAGES := ./test/integration/...
 BIN_DIR := bin
 COVERAGE_FILE ?= coverage.out
 COVERAGE_THRESHOLD ?= 80.0
-PACKAGE_FILE ?= classroom3-linux-amd64.tar.gz
+PACKAGE_FILE ?= classroom3.tar.gz
 
 CMDS := 01_errors 02_arrays 03_structs 04_new_make 05_slices 06_loops 07_functions 08_panics
 
