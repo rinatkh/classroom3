@@ -8,7 +8,7 @@ COVERAGE_FILE ?= coverage.out
 COVERAGE_THRESHOLD ?= 80.0
 PACKAGE_FILE ?= classroom3-linux-amd64.tar.gz
 
-CMDS := 01_errors 02_arrays 03_structs 04_new_make 05_slices 06_loops 07_functions 08_panics 09_common
+CMDS := 01_errors 02_arrays 03_structs 04_new_make 05_slices 06_loops 07_functions 08_panics
 
 .PHONY: help deps-check mod-check fmt fmt-check vet test test-unit test-integration test-race coverage coverage-check build package clean run-all ci $(addprefix run-,$(CMDS))
 
@@ -84,8 +84,6 @@ run-07_functions:
 	$(GO) run ./cmd/07_functions
 run-08_panics:
 	$(GO) run ./cmd/08_panics
-run-09_common:
-	$(GO) run ./cmd/09_common
 
 build:
 	@mkdir -p $(BIN_DIR)

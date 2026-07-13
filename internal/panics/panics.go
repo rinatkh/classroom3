@@ -61,8 +61,9 @@ func Example() string {
 
 		// Так делать НЕ нужно:
 		// код после panic в этой функции уже не выполнится.
-		fmt.Fprintf(&log, " -> after panic")
-		return
+
+		// fmt.Fprintf(&log, " -> after panic")
+		// return
 	}()
 
 	fmt.Fprintf(&out, "3) with panic -> %s", panicFlow)
